@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <style type="text/css">
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Sailec-Bold",system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Helvetica,Arial,sans-serif;
+        }
+
+        body{
+            height: 100vh;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: flex-start;
+            align-content: stretch;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            font-weight: bold;
+            height: 20%;
+        }
+
+        .status{
+            flex: 15% 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: grey;
+            font-size: 150%;
+            font-weight: bold;
+            color: azure;
+        }
+
+        .app-name{
+            display: flex;
+            justify-content: flex-start;
+            align-items:center ;
+            position: relative;
+            top: 5%;
+            padding-left: 2rem;
+            color: #222831;
+            height: 80%;
+            font-size: 160%;
+        }
+
+        .node-name{
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            height: 20%;
+            color: #CFD8DC;
+            font-size: 100%;
+            position: relative;
+            bottom: 5%;
+            align-self: flex-end;
+
+        }
+
+
+        .card {
+            max-width: 95%;
+            margin: 0 auto;
+            width: fit-content;
+            min-width: 30%;
+        }
+
+        .card:first-child{
+            color: #222831;
+        }
+
+        .card-header {
+            height: 3rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: rgba(34,40,49,0.85);
+            font-weight: bolder;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            font-size: 95%;
+            flex: initial 0;
+            margin-top: 0.5rem;
+        }
+
+        .card:first-child .card-header{
+            background-color: honeydew;
+        }
+
+        .card:not(:first-child) .card-header {
+            height: 2.5rem;
+        }
+
+        .card-header span {
+            width: 10rem;
+            margin-left: 1rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .card-header span:first-child{
+            margin-left: unset;
+        }
+
+        .task-data {
+            white-space: nowrap;
+            padding-bottom: 0.2rem;
+            width: 15rem;
+        }
+
+        .card:not(:first-child) .card-header span:not(:first-child){
+            color:#28df99;
+        }
+
+        .card-header span:last-child::-webkit-scrollbar-track {
+             box-shadow: inset 0 0 2px rgb(238, 238, 238);
+             background-color: #EEEEEEFF;
+         }
+
+        .card-header span:last-child::-webkit-scrollbar {
+             height: 6px;
+         }
+
+        .card-header span:last-child::-webkit-scrollbar-thumb {
+             border-radius: 2px;
+             box-shadow: inset 0 0 2px rgb(129, 156, 169, 0.5);
+             background-color: darkgrey;
+        }
+
+        .main{
+            display: flex;
+            height: 80%;
+
+        }
+
+        .main-content{
+            flex: 80% 0;
+            align-items: center;
+            margin-top: 4rem;
+
+        }
+
+        .menu{
+            flex: 20% 0;
+            display: flex;
+            margin:  auto;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding-bottom: 5rem;
+
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 2.7rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            color: rgba(34,40,49,0.85);
+            font-weight: bolder;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            font-size: 95%;
+            flex: initial 0;
+            margin-top: 0.5rem;
+            background-color: #28df99;
+            width: 18rem;
+            cursor: pointer;
+            margin-left: 2rem;
+        }
+
+        .menu-item.current, .menu-item:hover{
+            background-color: #1bb87c;
+        }
+
+        .menu-item  svg {
+            position: relative;
+            fill: #222831;
+            height : 1.5rem;
+            width: 1.5rem;
+        }
+
+        .menu-item div{
+            display: inline-block;
+            margin-left: 0.5rem;
+            font-size: 110%;
+            font-weight: bold;
+            color: #222831;
+        }
+
+        .content{
+            display: none;
+        }
+
+        .content.current{
+            display: block;
+        }
+
+
+    </style>
+    <meta charset="UTF-8">
+    <title th:text="${@environment.getProperty('spring.application.name')}">Title</title>
+</head>
+<body>
+<!--/*@thymesVar id="onetimetasks" type="java.util.List<com.davdev.persistenttask.dbscheduler.endpoint.common.TaskModel>"*/-->
+<!--/*@thymesVar id="recurringdynamictasks" type="java.util.List<com.davdev.persistenttask.dbscheduler.endpoint.common.TaskModel>"*/-->
+<!--/*@thymesVar id="recurringstatictasks" type="java.util.List<com.davdev.persistenttask.dbscheduler.endpoint.common.TaskModel>"*/-->
+
+    <div class="header" >
+        <div class="status" style="background-color:#28df99;box-shadow: 0 1px 3px rgba(0,121,10,0.12), 0 1px 2px rgba(0,121,101,0.24);">
+        </div>
+        <div class="app-name" th:text="${@environment.getProperty('spring.application.name')}">Application Name</div>
+        <div class="node-name" th:text="${@environment.getProperty('appdynamics.agent.nodeName')}">Node Name</div>
+    </div>
+
+
+    <div class="main">
+        <div class="menu">
+            <div class="menu-item" id="onetimetasks-menu-item">
+                <svg  version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 512 512">
+                    <g>
+                        <g>
+                            <path d="m256,51.8c-112.6,0-204.2,91.6-204.2,204.2s91.6,204.2 204.2,204.2 204.2-91.6 204.2-204.2-91.6-204.2-204.2-204.2v-1.42109e-14zm0,449.2c-135.1,0-245-109.9-245-245s109.9-245 245-245 245,109.9 245,245-109.9,245-245,245z"/>
+                            <path d="m344.1,276.4h-88.1c-11.3,0-20.4-9.1-20.4-20.4v-157.8c0-11.3 9.1-20.4 20.4-20.4 11.3,0 20.4,9.1 20.4,20.4v137.4h67.7c11.3,0 20.4,9.1 20.4,20.4 5.68434e-14,11.3-9.1,20.4-20.4,20.4z"/>
+                        </g>
+                    </g>
+                </svg>
+                <div>OneTime tasks</div>
+            </div>
+            <div class="menu-item" id="recurringdynamictasks-menu-item">
+                <svg  version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 512 512">
+                    <g>
+                        <g>
+                            <path d="m256,51.8c-112.6,0-204.2,91.6-204.2,204.2s91.6,204.2 204.2,204.2 204.2-91.6 204.2-204.2-91.6-204.2-204.2-204.2v-1.42109e-14zm0,449.2c-135.1,0-245-109.9-245-245s109.9-245 245-245 245,109.9 245,245-109.9,245-245,245z"/>
+                            <path d="m344.1,276.4h-88.1c-11.3,0-20.4-9.1-20.4-20.4v-157.8c0-11.3 9.1-20.4 20.4-20.4 11.3,0 20.4,9.1 20.4,20.4v137.4h67.7c11.3,0 20.4,9.1 20.4,20.4 5.68434e-14,11.3-9.1,20.4-20.4,20.4z"/>
+                        </g>
+                    </g>
+                </svg>
+                <div>Recurring dynamic tasks</div>
+            </div>
+            <div class="menu-item" id="recurringstatictasks-menu-item">
+                <svg  version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 512 512">
+                    <g>
+                        <g>
+                            <path d="m256,51.8c-112.6,0-204.2,91.6-204.2,204.2s91.6,204.2 204.2,204.2 204.2-91.6 204.2-204.2-91.6-204.2-204.2-204.2v-1.42109e-14zm0,449.2c-135.1,0-245-109.9-245-245s109.9-245 245-245 245,109.9 245,245-109.9,245-245,245z"/>
+                            <path d="m344.1,276.4h-88.1c-11.3,0-20.4-9.1-20.4-20.4v-157.8c0-11.3 9.1-20.4 20.4-20.4 11.3,0 20.4,9.1 20.4,20.4v137.4h67.7c11.3,0 20.4,9.1 20.4,20.4 5.68434e-14,11.3-9.1,20.4-20.4,20.4z"/>
+                        </g>
+                    </g>
+                </svg>
+                <div>Recurring static tasks</div>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="content" id="onetimetasks-content">
+                <div class="card">
+                    <div class="card-header">
+                        <span>Nom</span>
+                        <span>Id</span>
+                        <span>Date execution</span>
+                        <span>Dernier échec</span>
+                        <span class="task-data">Données</span>
+                    </div>
+                </div>
+                <div class="card" th:each="task: ${onetimetasks}">
+                    <div class="card-header">
+                        <span th:text="${task.taskName}">myLoggingTask</span>
+                        <span th:text="${task.taskId}">4a879f23fc79</span>
+                        <span th:text="${#dates.format(task.executionTime, 'dd/MM/yyyy HH:mm:ss')}">25/01/2023 11:00:45</span>
+                        <span th:text="${#dates.format(task.lastFailure, 'dd/MM/yyyy HH:mm:ss')}">25/01/2023 11:00:45</span>
+                        <span th:text="${task.taskData}">{ "name" : "myLoggingTask 2 param" }</span>
+                    </div>
+                </div>
+            </div>
+            <div class="content " id="recurringdynamictasks-content" >
+                <div class="card">
+                    <div class="card-header">
+                        <span>Nom</span>
+                        <span>Id</span>
+                        <span>Programmation</span>
+                        <span>Prochaine execution</span>
+                        <span>Dernier succés</span>
+                        <span>Dernier échec</span>
+                        <span class="task-data">Données</span>
+                    </div>
+                </div>
+                <div class="card" th:each="task: ${recurringdynamictasks}">
+                    <div class="card-header">
+                        <span th:text="${task.taskName}">myLoggingTask</span>
+                        <span th:text="${task.taskId}">4a879f23fc79</span>
+                        <span th:text="${task.schedule}">4a879f23fc79</span>
+                        <span th:text="${#dates.format(task.executionTime, 'dd/MM/yyyy HH:mm:ss')}">25/01/2023 11:00:45</span>
+                        <span th:text="${#dates.format(task.lastSuccess, 'dd/MM/yyyy HH:mm:ss')}">25/01/2023 11:00:45</span>
+                        <span th:text="${#dates.format(task.lastFailure, 'dd/MM/yyyy HH:mm:ss')}">25/01/2023 11:00:45</span>
+                        <span th:text="${task.taskData}">{ "name" : "myLoggingTask 2 param" }</span>
+                    </div>
+                </div>
+            </div>
+            <div class="content" id="recurringstatictasks-content" >
+                <div class="card">
+                    <div class="card-header">
+                        <span>Nom</span>
+                        <span>Programmation</span>
+                        <span>Prochaine execution</span>
+                        <span>Dernier succés</span>
+                        <span>Dernier échec</span>
+                    </div>
+                </div>
+                <div class="card" th:each="task: ${recurringstatictasks}">
+                    <div class="card-header">
+                        <span th:text="${task.taskName}">myLoggingTask</span>
+                        <span th:text="${task.schedule}">4a879f23fc79</span>
+                        <span th:text="${#dates.format(task.executionTime, 'dd/MM/yyyy HH:mm:ss')}">25/01/2023 11:00:45</span>
+                        <span th:text="${#dates.format(task.lastSuccess, 'dd/MM/yyyy HH:mm:ss')}">25/01/2023 11:00:45</span>
+                        <span th:text="${#dates.format(task.lastFailure, 'dd/MM/yyyy HH:mm:ss')}">25/01/2023 11:00:45</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script >
+        const onetimetasksMenuItem = document.getElementById("onetimetasks-menu-item");
+        const onetimetasksContent = document.getElementById("onetimetasks-content");
+        const recurringdynamictasksMenuItem = document.getElementById("recurringdynamictasks-menu-item");
+        const recurringdynamictasksContent = document.getElementById("recurringdynamictasks-content");
+        const recurringstatictasksMenuItem = document.getElementById("recurringstatictasks-menu-item");
+        const recurringstatictasksContent = document.getElementById("recurringstatictasks-content");
+
+
+        onetimetasksMenuItem.addEventListener('click', function (){
+            console.log(onetimetasksMenuItem.classList)
+            recurringstatictasksMenuItem.classList.remove("current");
+            recurringstatictasksContent.classList.remove("current");
+            recurringdynamictasksMenuItem.classList.remove("current");
+            recurringdynamictasksContent.classList.remove("current");
+            if(!onetimetasksMenuItem.classList.contains("current")){
+                onetimetasksMenuItem.classList.add("current");
+                onetimetasksContent.classList.add("current");
+            }
+        });
+
+        recurringdynamictasksMenuItem.addEventListener('click', function (){
+            onetimetasksMenuItem.classList.remove("current");
+            onetimetasksContent.classList.remove("current");
+            recurringstatictasksMenuItem.classList.remove("current");
+            recurringstatictasksContent.classList.remove("current");
+            if(!recurringdynamictasksMenuItem.classList.contains("current")){
+                recurringdynamictasksMenuItem.classList.add("current");
+                recurringdynamictasksContent.classList.add("current");
+            }
+        });
+
+
+
+        recurringstatictasksMenuItem.addEventListener('click', function (){
+            onetimetasksMenuItem.classList.remove("current");
+            onetimetasksContent.classList.remove("current");
+            recurringdynamictasksMenuItem.classList.remove("current");
+            recurringdynamictasksContent.classList.remove("current");
+            if(!recurringstatictasksMenuItem.classList.contains("current")){
+                recurringstatictasksMenuItem.classList.add("current");
+                recurringstatictasksContent.classList.add("current");
+            }
+        });
+
+
+    </script>
+</body>
+</html>

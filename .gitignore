@@ -1,0 +1,38 @@
+#Pas de fichiers de logs
+*.log*
+*.tlog
+#Pas de fichiers .dmp
+*.dmp*
+#Pas de fichiers .trc
+*.trc*
+#Pas de livrables binaires
+**/*.ear
+**/*.war
+**/*.jar
+**/*.class
+#Pas de repertoire de build standard du socle/maven
+**/*/target
+**/*/target-*/
+target/
+.back
+#
+bin
+.settings
+.classpath
+.project
+*/.project
+*/.factorypath
+#Fichier manifest.mf genere dans le war
+*-war/src/main/webapp/META-INF/MANIFEST.MF
+*-war/src/main/webapp/META-INF/maven/
+#
+*-war/src/main/webapp/WEB-INF/classes/
+#
+*/.apt_generated/
+*/.tern-project
+#Fichier genere par m2e
+*-war/**/pom.properties
+*-ear/**/application.xml
+
+/.idea/
+**/*.iml
