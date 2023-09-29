@@ -1,2 +1,2 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=io.github.dnsene.kagkarlssondbscheduler.boot.DbSchedulerAutoConfiguration
-org.springframework.boot.diagnostics.FailureAnalyzer=io.github.dnsene.kagkarlssondbscheduler.boot.startup.CustomFailureAnalyzer
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=io.github.dnsene.dbscheduler.declarativetasks.boot.DbSchedulerAutoConfiguration
+org.springframework.boot.diagnostics.FailureAnalyzer=io.github.dnsene.dbscheduler.declarativetasks.boot.startup.CustomFailureAnalyzer

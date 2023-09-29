@@ -1,15 +1,16 @@
-# spring-boot-starter-kagkarlsson-db-scheduler
+# spring-boot-starter-db-scheduler-declarative-tasks
 
 
-This library provide is a less invasive integration of the awesome persistent task library  [db-scheduler](https://github.com/kagkarlsson/db-scheduler) with spring-boot
-compared to the [original spring boot starter](https://github.com/kagkarlsson/db-scheduler#spring-boot-usage) that is provided by the official maintainers.
+This starter provide a less invasive integration of the awesome persistent tasks library  [db-scheduler](https://github.com/kagkarlsson/db-scheduler) 
+with spring-boot by allowing a declarative way to create tasks.  
+It is built on top of the [original spring boot starter](https://github.com/kagkarlsson/db-scheduler#spring-boot-usage)  provided by the official maintainers.
 
 ## Maven Dependency
 
 ````xml
   <dependency>
     <groupId>io.github.dnsene</groupId>
-    <artifactId>spring-boot-starter-kagkarlsson-db-scheduler</artifactId>
+    <artifactId>spring-boot-starter-db-scheduler-declarative-tasks</artifactId>
 	<version>....</version>
   </dependency>
 ````
@@ -17,41 +18,41 @@ compared to the [original spring boot starter](https://github.com/kagkarlsson/db
 ## Usage
 
 ### Defining a task
-A task is a bean's method annotated with `@Task('name')`.  
+A task is a spring bean's method annotated with `@Task('name')`.  
 It is identified by a name defined through this annotation.  
-It can be parameterized and in that case, the parameter must be serializable.  
-In the example below we declare two tasks named `simpleTask` and `parametizedTask`.   
+It can be parameterized and the parameter must be serializable.  
+In the example below we declare two tasks named `simpleTask` and `parametizedTask`.
 
 ````java
 
-import io.github.dnsene.kagkarlssondbscheduler.api.Task;
-import lombok.extern.slf4j.Slf4j;
+import io.github.dnsene.dbscheduler.declarativetasks.api.Task;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AService {
 
     @Task("simpleTask")
-    public void mySimpleTask(){
-      log.info("Logging from task : simpleTask");
-   }
+    public void mySimpleTask() {
+        log.info("Logging from task : simpleTask");
+    }
 
     @Task("parameterizedTask")
-    public void myParametizedTask(DomainObject domainObject){
-      log.info("Logging from parameterizedTask with param {}" , domainObject.toString());
+    public void myParametizedTask(DomainObject domainObject) {
+        log.info("Logging from parameterizedTask with param {}", domainObject.toString());
     }
-    
+
 }
 ````
 
 
 ### Schedule a one-time execution of a task
-Task execution scheduling is done through the interface `PersistentTaskScheduler`.
+Task execution scheduling is done through the interface `TaskScheduler`.
 
 ```java
-import io.github.dnsene.kagkarlssondbscheduler.api.Task;
+
 import org.springframework.stereotype.Component;
-import io.github.dnsene.kagkarlssondbscheduler.api.TaskScheduler;
+import io.github.dnsene.dbscheduler.declarativetasks.api.TaskScheduler;
+
 import java.time.LocalDateTime;
 
 @Component
@@ -78,7 +79,7 @@ public class AnotherService {
 }
 ```
 
-Each method of`TaskScheduler` that schedules the execution of a task returns an identifier (the task's execution id).  
+Each method of `TaskScheduler` that schedules the execution of a task returns an identifier (the task's execution id).  
 This identifier can be used later either to cancel the task, reschedule it or check its status.
 
 
@@ -105,13 +106,10 @@ Example :
 In the example below, the two tasks are scheduled to run every 10 minutes
 
 ```java
-import io.github.dnsene.kagkarlssondbscheduler.api.Task;
-import io.github.dnsene.kagkarlssondbscheduler.api.FixedDelay;
+
+import io.github.dnsene.dbscheduler.declarativetasks.api.FixedDelay;
 import org.springframework.stereotype.Component;
 import io.github.dnsene.persistenttasks.TaskScheduler;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
 
 @Component
 public class AnotherService {
@@ -129,7 +127,7 @@ public class AnotherService {
     public void domainMethod2() {
         ....
         DomainObject domainObject = DomainObject.of("Hello");
-        String taskInstanceId = taskScheduler.schedule("parameterizedTask",  FixedDelay.ofMinutes(10), domainObject);
+        String taskInstanceId = taskScheduler.schedule("parameterizedTask", FixedDelay.ofMinutes(10), domainObject);
         .....
     }
     
@@ -161,10 +159,8 @@ Example:
 
 ````java
 
-import io.github.dnsene.kagkarlssondbscheduler.api.Task;
-import io.github.dnsene.kagkarlssondbscheduler.api.RunOnFixedDelay;
-import io.github.dnsene.kagkarlssondbscheduler.api.RunOnCronSchedule;
-import lombok.extern.slf4j.Slf4j;
+import io.github.dnsene.dbscheduler.declarativetasks.api.Task;
+import io.github.dnsene.dbscheduler.declarativetasks.api.RunOnFixedDelay;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -172,16 +168,16 @@ public class AService {
 
     @Task("simpleTask")
     @RunOnFixedDelay(value = 10, unit = ChronoUnit.SECONDS)
-    public void mySimpleTask(){
-      log.info("Logging from task : simpleTask");
-   }
+    public void mySimpleTask() {
+        log.info("Logging from task : simpleTask");
+    }
 
     @Task("simpleTask2")
     @RunOnChronSchedule("*/15 * * * * *")
-    public void mySimpleTask2(){
+    public void mySimpleTask2() {
         log.info("Logging from task : simpleTask2");
     }
-    
+
 }
 ````
 With this method, an execution of the task is programmed at the start of the application.  
